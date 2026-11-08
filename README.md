@@ -19,6 +19,73 @@
 
 Python、DuckDB、SQL、Power BI（看板）。
 
+## 数据库结构
+
+shenzhen-bike-user-lifecycle-analytics/
+│
+├── README.md
+├── LICENSE
+├── .gitignore
+├── requirements.txt
+├── config.example.toml
+│
+├── data/
+│   ├── README.md
+│   ├── raw/
+│   │   └── .gitkeep
+│   ├── processed/
+│   │   └── .gitkeep
+│   └── marts/
+│       └── .gitkeep
+│
+├── docs/
+│   ├── data_dictionary.md
+│   ├── metric_definitions.md
+│   ├── dashboard_spec.md
+│   ├── strategy_playbook.md
+│   └── limitations.md
+│
+├── sql/
+│   ├── 01_build_clean_trip.sql
+│   ├── 02_build_user_daily_activity.sql
+│   ├── 03_build_cohort_retention.sql
+│   ├── 04_build_user_lifecycle.sql
+│   ├── 05_build_grid_daily_metrics.sql
+│   └── 06_business_questions.sql
+│
+├── src/
+│   ├── ingest_raw_data.py
+│   ├── data_quality_check.py
+│   ├── build_features.py
+│   ├── build_dashboard_tables.py
+│   └── export_dashboard_data.py
+│
+├── notebooks/
+│   ├── 00_data_profiling.ipynb
+│   ├── 01_trip_and_time_analysis.ipynb
+│   ├── 02_cohort_retention_analysis.ipynb
+│   ├── 03_user_segmentation.ipynb
+│   └── 04_spatial_scenario_analysis.ipynb
+│
+├── dashboard/
+│   ├── README.md
+│   ├── shenzhen_bike_operations_dashboard.pbix
+│   └── screenshots/
+│       ├── 01_business_overview.png
+│       ├── 02_activation_retention.png
+│       ├── 03_user_lifecycle.png
+│       └── 04_spatial_strategy.png
+│
+├── reports/
+│   ├── executive_summary.md
+│   └── shenzhen_bike_growth_strategy.pdf
+│
+└── figures/
+    ├── cohort_retention_heatmap.png
+    ├── user_segment_distribution.png
+    ├── activity_decline_curve.png
+    └── spatial_demand_map.png
+
 ## 最终交付
 
 - 可复现的数据清洗与质量检查流程
