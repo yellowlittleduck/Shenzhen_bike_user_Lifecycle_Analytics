@@ -1,0 +1,5 @@
+# Copy this file to config.toml and update the local paths. config.toml is ignored by Git.
+[paths]
+raw_data_dir = "D:/dataset/kkk178/P111.科研专用深圳市2017-2021共享单车全周期/深圳共享单车数据"
+database_path = "data/processed/shenzhen_bike.duckdb"
+mart_dir = "data/marts"

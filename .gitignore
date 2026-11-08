@@ -1,0 +1,25 @@
+# Local raw and generated data: never commit the 29GB source dataset.
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/marts/*
+!data/marts/.gitkeep
+*.csv
+*.parquet
+*.duckdb
+*.db
+
+# BI exports may embed data; publish screenshots instead by default.
+*.pbix
+*.twbx
+
+# Local settings and Python artefacts
+.env
+config.toml
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+.DS_Store
