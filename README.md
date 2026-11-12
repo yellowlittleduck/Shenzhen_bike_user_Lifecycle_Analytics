@@ -1,109 +1,101 @@
 # 深圳共享两轮用户生命周期与增长策略分析
 
-基于深圳共享两轮车匿名订单数据，构建用户活跃、同期群留存、生命周期分层和空间场景指标体系，并以数据看板支持增长与策略决策。
+基于深圳共享两轮匿名订单数据，使用 Python、DuckDB、SQL 与 Power BI 完成从数据质量检查、订单清洗、需求分析到空间热点识别的可复现分析流程。本项目将描述性数据发现转化为待验证的增长与运营策略假设。
 
-## 业务问题
+> 原始订单数据、处理后的明细、DuckDB 数据库与 Power BI 源文件均不上传至 GitHub；项目仅公开可复现代码、指标口径、看板截图和分析方法。
 
-1. 哪些观察期首现用户没有完成激活，在哪个阶段流失？
-2. 哪些用户已形成稳定骑行习惯，哪些用户出现活跃下滑？
-3. 哪些时间与空间场景值得进一步排查，并优先验证什么策略？
+## 看板预览
 
-## 数据范围与边界
+![需求总览看板](dashboard/screenshots/01_demand_overview.png)
 
-- 数据粒度：匿名用户的骑行订单，包含起止时间和起终点坐标；部分批次含企业标识。
-- 观察期：以本地原始数据实际覆盖日期为准，预期为 2021 年 1 月至 8 月。
-- 原始数据不上传至 GitHub：文件体积大，且需遵守数据来源与使用限制。
-- 本项目不包含注册、曝光、优惠券、价格、支付、车辆库存、投诉等数据。因此策略仅作为待验证假设，不能直接声称产生因果增量。
+Power BI 交互式看板链接将在确认数据使用与公开发布条件后补充。
 
-## 技术栈
+## 项目回答的业务问题
 
-Python、DuckDB、SQL、Power BI（看板）。
+1. 一天中哪些时段的骑行需求最高，工作日与周末有何差异？
+2. 需求在城市空间上集中于哪些起点网格？
+3. 如何基于首现、活跃和沉默行为构建用户生命周期与留存分析框架？
+4. 对不同人群和场景，可以优先验证哪些增长、召回与服务保障策略？
 
-## 数据库结构
+## 当前阶段成果：需求总览
 
-shenzhen-bike-user-lifecycle-analytics/
-│
-├── README.md
-├── LICENSE
-├── .gitignore
+### 数据范围与清洗
+
+- 稳定观察期：**2021-04-08 至 2021-08-28**，共 143 天。
+- 最终有效订单：**216,128,959** 笔；去重匿名用户：**9,966,667** 人。
+- 清洗规则：保留骑行时长 1–1,440 分钟的订单；剔除时长不足 1 分钟及超过 24 小时的极端记录。
+- 空间分析：将订单起点聚合至约 500 米网格，不展示单个用户的轨迹或精确起点。
+
+### 需求发现
+
+- 日均订单量约 **151 万**，日均活跃用户约 **78.8 万**。
+- 早晚高峰显著，通勤高峰订单占比约 **49.59%**。
+- 工作日的日均订单量和通勤高峰占比高于周末；周末平均骑行时长更长。
+- 高需求起点网格集中于城市核心区域，可作为调度保障、重点巡检和场景化运营的优先排查范围。
+
+上述结论用于发现机会与提出假设，不代表策略已带来因果增量。
+
+## 策略假设
+
+| 目标人群 / 场景 | 观察信号 | 待验证策略 | 主指标 | 护栏指标 |
+|---|---|---|---|---|
+| 首骑未激活用户 | 首现后 7 天仅骑行 1 次 | 降低第二次骑行门槛，促进完成第二次骑行 | 7 日复骑率 | 补贴成本、投诉率、异常订单率 |
+| 成长型下滑用户 | 首周多次骑行，近 7 天无骑行 | 在历史高频时段进行分层触达 | 7 日回流率 | 打扰率、退订率、成本 |
+| 稳定通勤用户 | 多个工作日早晚高峰骑行，OD 相对稳定 | 优化常用场景的服务确定性 | 30 日留存率 | 负反馈率、服务成本 |
+
+完整策略说明见 [docs/strategy_playbook.md](docs/strategy_playbook.md)。由于公开订单数据不含曝光、优惠券、价格、支付、车辆库存与投诉数据，所有策略均需补充业务链路数据后，以分层随机 A/B 实验验证。
+
+## 项目结构
+
+```text
+Shenzhen_bike_user_Lifecycle_Analytics/
+├── config.example.toml          # 本地数据路径配置模板
 ├── requirements.txt
-├── config.example.toml
-│
-├── data/
-│   ├── README.md
-│   ├── raw/
-│   │   └── .gitkeep
-│   ├── processed/
-│   │   └── .gitkeep
-│   └── marts/
-│       └── .gitkeep
-│
+├── sql/
+│   ├── 01_build_fact_trip_base.sql
+│   ├── 02_build_fact_trip_clean.sql
+│   ├── 03_build_demand_marts.sql
+│   └── 04_build_origin_grid_mart.sql
+├── src/
+│   ├── 00_check_data.py
+│   ├── 01_build_staging_and_profile.py
+│   ├── 02_run_fact_trip_base.py
+│   ├── 03_profile_trip_duration.py
+│   ├── 04_run_fact_trip_clean.py
+│   ├── 05_run_demand_marts.py
+│   └── 06_run_origin_grid_mart.py
 ├── docs/
 │   ├── data_dictionary.md
 │   ├── metric_definitions.md
 │   ├── dashboard_spec.md
-│   ├── strategy_playbook.md
-│   └── limitations.md
-│
-├── sql/
-│   ├── 01_build_clean_trip.sql
-│   ├── 02_build_user_daily_activity.sql
-│   ├── 03_build_cohort_retention.sql
-│   ├── 04_build_user_lifecycle.sql
-│   ├── 05_build_grid_daily_metrics.sql
-│   └── 06_business_questions.sql
-│
-├── src/
-│   ├── ingest_raw_data.py
-│   ├── data_quality_check.py
-│   ├── build_features.py
-│   ├── build_dashboard_tables.py
-│   └── export_dashboard_data.py
-│
-├── notebooks/
-│   ├── 00_data_profiling.ipynb
-│   ├── 01_trip_and_time_analysis.ipynb
-│   ├── 02_cohort_retention_analysis.ipynb
-│   ├── 03_user_segmentation.ipynb
-│   └── 04_spatial_scenario_analysis.ipynb
-│
-├── dashboard/
-│   ├── README.md
-│   ├── shenzhen_bike_operations_dashboard.pbix
-│   └── screenshots/
-│       ├── 01_business_overview.png
-│       ├── 02_activation_retention.png
-│       ├── 03_user_lifecycle.png
-│       └── 04_spatial_strategy.png
-│
-├── reports/
-│   ├── executive_summary.md
-│   └── shenzhen_bike_growth_strategy.pdf
-│
-└── figures/
-    ├── cohort_retention_heatmap.png
-    ├── user_segment_distribution.png
-    ├── activity_decline_curve.png
-    └── spatial_demand_map.png
+│   └── strategy_playbook.md
+└── dashboard/
+    ├── README.md
+    └── screenshots/
+        └── 01_demand_overview.png
+```
 
-## 最终交付
-
-- 可复现的数据清洗与质量检查流程
-- 用户日活、同期群留存、生命周期分层和空间网格指标表
-- 4 页运营策略看板
-- 策略实验方案与项目总结
-
-## 项目结构
-
-详见仓库目录。`data/` 只保留目录说明，不保存原始或处理后的订单明细。
-
-## 运行顺序
+## 复现步骤
 
 1. 复制 `config.example.toml` 为本地 `config.toml`，填写原始数据目录。
-2. 安装依赖：`python -m pip install -r requirements.txt`
-3. 运行 `src/ingest_raw_data.py`、`src/data_quality_check.py` 与后续 SQL 脚本。
-4. 将 `data/marts/` 导入 Power BI，按 `docs/dashboard_spec.md` 搭建看板。
+2. 安装依赖：`python -m pip install -r requirements.txt`。
+3. 按以下顺序运行脚本：
 
-## 指标口径
+```text
+python src/00_check_data.py
+python src/01_build_staging_and_profile.py
+python src/02_run_fact_trip_base.py
+python src/03_profile_trip_duration.py
+python src/04_run_fact_trip_clean.py
+python src/05_run_demand_marts.py
+python src/06_run_origin_grid_mart.py
+```
 
-见 [docs/metric_definitions.md](docs/metric_definitions.md)。
+4. 将 `data/marts/` 下的聚合 CSV 导入 Power BI，按照 [docs/dashboard_spec.md](docs/dashboard_spec.md) 搭建看板。
+
+## 指标与边界
+
+- 指标口径见 [docs/metric_definitions.md](docs/metric_definitions.md)。
+- `观察期首现用户` 不等同于平台注册新用户。
+- 直线距离不等同于实际路网骑行距离。
+- 本项目不对平台供给不足、服务故障或策略效果作因果推断。

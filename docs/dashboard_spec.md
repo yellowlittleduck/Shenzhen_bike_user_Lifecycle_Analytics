@@ -2,7 +2,7 @@
 
 ## 1. 经营总览
 
-核心指标：订单量、DAU、WAU、MAU、人均订单、观察期首现用户。展示日期趋势、小时热力图、骑行时长分布和起终点热点。
+核心指标：订单量、DAU、WAU、MAU、人均订单、观察期首现用户。展示日期趋势、小时热力图、骑行时长分布和起终点热点。数据源为 `mart_daily_metrics`、`mart_hourly_metrics`、`mart_day_type_hourly_metrics`、`mart_weekday_hour_metrics` 与 `mart_day_type_summary`。
 
 ## 2. 激活与留存
 
