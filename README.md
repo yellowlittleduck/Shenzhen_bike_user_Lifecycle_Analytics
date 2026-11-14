@@ -8,6 +8,8 @@
 
 ![需求总览看板](dashboard/screenshots/01_demand_overview.png)
 
+![策略分析看板](dashboard/screenshots/02_strategy_analysis.png)
+
 Power BI 交互式看板链接将在确认数据使用与公开发布条件后补充。
 
 ## 项目回答的业务问题
@@ -17,7 +19,7 @@ Power BI 交互式看板链接将在确认数据使用与公开发布条件后�
 3. 如何基于首现、活跃和沉默行为构建用户生命周期与留存分析框架？
 4. 对不同人群和场景，可以优先验证哪些增长、召回与服务保障策略？
 
-## 当前阶段成果：需求总览
+## 当前阶段成果：需求总览与策略分析
 
 ### 数据范围与清洗
 
@@ -39,9 +41,9 @@ Power BI 交互式看板链接将在确认数据使用与公开发布条件后�
 
 | 目标人群 / 场景 | 观察信号 | 待验证策略 | 主指标 | 护栏指标 |
 |---|---|---|---|---|
-| 首骑未激活用户 | 首现后 7 天仅骑行 1 次 | 降低第二次骑行门槛，促进完成第二次骑行 | 7 日复骑率 | 补贴成本、投诉率、异常订单率 |
-| 成长型下滑用户 | 首周多次骑行，近 7 天无骑行 | 在历史高频时段进行分层触达 | 7 日回流率 | 打扰率、退订率、成本 |
-| 稳定通勤用户 | 多个工作日早晚高峰骑行，OD 相对稳定 | 优化常用场景的服务确定性 | 30 日留存率 | 负反馈率、服务成本 |
+| 首周低激活用户 | 首周仅骑行 1 次 | 降低第二次骑行门槛，促进完成重复骑行 | 7 日复骑率 | 补贴成本、投诉率、异常订单率 |
+| 流失风险用户 | 历史至少 5 次骑行、3 个活跃日，但连续 14 天未骑行 | 在历史高频场景进行分层触达 | 7 日回流率 | 打扰率、退订率、成本 |
+| 稳定通勤用户 | 近期活跃，早晚高峰骑行占比较高 | 优化高峰服务确定性 | 30 日留存率 | 负反馈率、服务成本 |
 
 完整策略说明见 [docs/strategy_playbook.md](docs/strategy_playbook.md)。由于公开订单数据不含曝光、优惠券、价格、支付、车辆库存与投诉数据，所有策略均需补充业务链路数据后，以分层随机 A/B 实验验证。
 
@@ -55,7 +57,8 @@ Shenzhen_bike_user_Lifecycle_Analytics/
 │   ├── 01_build_fact_trip_base.sql
 │   ├── 02_build_fact_trip_clean.sql
 │   ├── 03_build_demand_marts.sql
-│   └── 04_build_origin_grid_mart.sql
+│   ├── 04_build_origin_grid_mart.sql
+│   └── 05_build_lifecycle_strategy_marts.sql
 ├── src/
 │   ├── 00_check_data.py
 │   ├── 01_build_staging_and_profile.py
@@ -63,16 +66,19 @@ Shenzhen_bike_user_Lifecycle_Analytics/
 │   ├── 03_profile_trip_duration.py
 │   ├── 04_run_fact_trip_clean.py
 │   ├── 05_run_demand_marts.py
-│   └── 06_run_origin_grid_mart.py
+│   ├── 06_run_origin_grid_mart.py
+│   └── 07_run_lifecycle_strategy_marts.py
 ├── docs/
 │   ├── data_dictionary.md
 │   ├── metric_definitions.md
 │   ├── dashboard_spec.md
-│   └── strategy_playbook.md
+│   ├── strategy_playbook.md
+│   └── lifecycle_strategy_findings.md
 └── dashboard/
     ├── README.md
     └── screenshots/
-        └── 01_demand_overview.png
+        ├── 01_demand_overview.png
+        └── 02_strategy_analysis.png
 ```
 
 ## 复现步骤
@@ -89,6 +95,7 @@ python src/03_profile_trip_duration.py
 python src/04_run_fact_trip_clean.py
 python src/05_run_demand_marts.py
 python src/06_run_origin_grid_mart.py
+python src/07_run_lifecycle_strategy_marts.py
 ```
 
 4. 将 `data/marts/` 下的聚合 CSV 导入 Power BI，按照 [docs/dashboard_spec.md](docs/dashboard_spec.md) 搭建看板。

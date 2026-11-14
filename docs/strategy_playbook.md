@@ -7,3 +7,5 @@
 | 稳定通勤型 | 多工作日早晚高峰且 OD 稳定 | 常用场景的服务确定性可提升留存 | 30 日留存 | 负反馈率、服务成本 |
 
 所有策略需要在补充曝光、权益与订单链路数据后，以分层随机 A/B 实验验证。
+
+当前样本中的量化发现与对应口径见 [lifecycle_strategy_findings.md](lifecycle_strategy_findings.md)。
